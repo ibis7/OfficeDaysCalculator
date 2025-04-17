@@ -8,16 +8,22 @@ interface Holiday {
   description: string;
 }
 
+interface DayInfo {
+  date: string;
+  description: string;
+  type: 'holiday' | 'pto';
+}
+
 @Component({
   selector: 'app-office-days',
   templateUrl: './office-days.component.html',
   styleUrls: ['./office-days.component.scss'],
-  imports: [FormsModule, NgIf, NgFor], // Add any necessary imports here
+  standalone: true,
+  imports: [FormsModule, NgIf, NgFor],
 })
 export class OfficeDaysComponent implements OnInit {
   PTO: number = 0;
   holidays: Holiday[] = [];
-  officeDays: number | null = null;
   holidayDescriptions: string[] = [];
 
   selectedMonth: number;
@@ -41,6 +47,14 @@ export class OfficeDaysComponent implements OnInit {
     'December',
   ];
 
+  officeDaysRounded: number | null = null;
+  exactOfficeDays: number = 0;
+  totalBusinessDays: number = 0;
+  totalWeekendDays: number = 0;
+  totalWeekdayHolidays: number = 0;
+
+  visibleDays: DayInfo[] = [];
+
   constructor() {
     const today = new Date();
     this.selectedMonth = today.getMonth();
@@ -56,7 +70,7 @@ export class OfficeDaysComponent implements OnInit {
     this.loadHolidays();
   }
 
-  onSelectionChange() {
+  onSelectionChange(): void {
     this.calculateOfficeDays();
   }
 
@@ -64,7 +78,16 @@ export class OfficeDaysComponent implements OnInit {
     fetch('assets/holidays.json')
       .then((response) => response.json())
       .then((data: Holiday[]) => {
-        this.holidays = data;
+        this.holidays = data.map((h) => {
+          const [year, month, day] = h.date.split('-').map(Number);
+          const date = new Date(Date.UTC(year, month - 1, day));
+          const formattedDate = date.toISOString().split('T')[0];
+          return {
+            date: formattedDate,
+            description: h.description,
+          };
+        });
+
         this.calculateOfficeDays();
       })
       .catch((error) => {
@@ -74,21 +97,26 @@ export class OfficeDaysComponent implements OnInit {
 
   calculateOfficeDays(): void {
     const holidaysThisMonth = this.holidays.filter((h) => {
-      const date = new Date(h.date);
-      return (
-        date.getFullYear() === this.selectedYear &&
-        date.getMonth() === this.selectedMonth
-      );
+      const [year, month, day] = h.date.split('-').map(Number);
+      return year === this.selectedYear && month - 1 == this.selectedMonth;
     });
 
     const weekdayHolidays = new Set<string>();
     this.holidayDescriptions = [];
+    this.totalWeekdayHolidays = 0;
+    this.visibleDays = [];
 
     holidaysThisMonth.forEach((h) => {
       const date = new Date(h.date);
       const dow = date.getDay();
       if (dow !== 0 && dow !== 6) {
         weekdayHolidays.add(h.date);
+        this.totalWeekdayHolidays++;
+        this.visibleDays.push({
+          date: h.date,
+          description: h.description,
+          type: 'holiday',
+        });
       }
       this.holidayDescriptions.push(`${h.date}: ${h.description}`);
     });
@@ -98,20 +126,25 @@ export class OfficeDaysComponent implements OnInit {
       this.selectedMonth + 1,
       0
     ).getDate();
-    let businessDays = 0;
+    this.totalWeekendDays = 0;
+    this.totalBusinessDays = 0;
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(this.selectedYear, this.selectedMonth, day);
       const dow = date.getDay();
       const dateStr = date.toISOString().split('T')[0];
 
-      if (dow === 0 || dow === 6) continue;
+      if (dow === 0 || dow === 6) {
+        this.totalWeekendDays++;
+        continue;
+      }
       if (weekdayHolidays.has(dateStr)) continue;
 
-      businessDays++;
+      this.totalBusinessDays++;
     }
 
-    const effectiveDays = Math.max(0, businessDays - this.PTO);
-    this.officeDays = Math.floor(effectiveDays * this.OFFICE_PERCENTAGE);
+    const effectiveDays = Math.max(0, this.totalBusinessDays - this.PTO);
+    this.exactOfficeDays = effectiveDays * this.OFFICE_PERCENTAGE;
+    this.officeDaysRounded = Math.floor(this.exactOfficeDays);
   }
 }

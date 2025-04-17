@@ -1,13 +1,15 @@
 <h1>Office Days Calculator</h1>
 
-<label for="pto">Enter your PTO days:</label>
-<input
-  type="number"
-  id="pto"
-  [(ngModel)]="PTO"
-  (input)="calculateOfficeDays()"
-  min="0"
-/>
+<div>
+  <label for="pto">Enter your PTO days:</label>
+  <input
+    type="number"
+    id="pto"
+    [(ngModel)]="PTO"
+    (input)="calculateOfficeDays()"
+    min="0"
+  />
+</div>
 
 <div style="margin: 1em 0">
   <label for="month">Month:</label>
@@ -23,14 +25,28 @@
   </select>
 </div>
 
-<p *ngIf="officeDays !== null">
-  You have to go to the office <strong>{{ officeDays }}</strong> time(s) this
-  month.
+<hr />
+
+<h2>Breakdown</h2>
+<ul>
+  <li>Weekend days: {{ totalWeekendDays }}</li>
+  <li>Weekday holidays: {{ totalWeekdayHolidays }}</li>
+  <li>PTO days: {{ PTO }}</li>
+  <li>Total business days (excluding above): {{ totalBusinessDays }}</li>
+</ul>
+
+<p *ngIf="officeDaysRounded !== null">
+  You should go to the office <strong>{{ officeDaysRounded }}</strong> day(s)
+  this month.<br />
+  (Exact: {{ exactOfficeDays.toFixed(2) }})
 </p>
 
-<div *ngIf="holidayDescriptions.length">
-  <h3>Holidays this month:</h3>
-  <ul>
-    <li *ngFor="let holiday of holidayDescriptions">{{ holiday }}</li>
-  </ul>
-</div>
+<hr />
+
+<h2>Days off this month</h2>
+<ul>
+  <li *ngFor="let day of visibleDays">
+    <span *ngIf="day.type === 'holiday'">📅</span>
+    {{ day.date }} - {{ day.description }}
+  </li>
+</ul>
