@@ -8,6 +8,7 @@
     [(ngModel)]="PTO"
     (input)="calculateOfficeDays()"
     min="0"
+    max="{{ totalBusinessDays }}"
   />
 </div>
 
@@ -29,10 +30,10 @@
 
 <h2>Breakdown</h2>
 <ul>
-  <li>Weekend days: {{ totalWeekendDays }}</li>
   <li>Weekday holidays: {{ totalWeekdayHolidays }}</li>
+  <li>Weekend days: {{ totalWeekendDays }}</li>
+  <li>Total business days (-holidays, -weekends): {{ totalBusinessDays }}</li>
   <li>PTO days: {{ PTO }}</li>
-  <li>Total business days (excluding above): {{ totalBusinessDays }}</li>
 </ul>
 
 <p *ngIf="officeDaysRounded !== null">

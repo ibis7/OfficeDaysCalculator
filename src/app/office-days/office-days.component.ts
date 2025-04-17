@@ -109,7 +109,7 @@ export class OfficeDaysComponent implements OnInit {
     holidaysThisMonth.forEach((h) => {
       const date = new Date(h.date);
       const dow = date.getDay();
-      if (dow !== 0 && dow !== 6) {
+      if (!this.isWeekend(dow)) {
         weekdayHolidays.add(h.date);
         this.totalWeekdayHolidays++;
         this.visibleDays.push({
@@ -134,7 +134,7 @@ export class OfficeDaysComponent implements OnInit {
       const dow = date.getDay();
       const dateStr = date.toISOString().split('T')[0];
 
-      if (dow === 0 || dow === 6) {
+      if (this.isWeekend(dow)) {
         this.totalWeekendDays++;
         continue;
       }
@@ -146,5 +146,9 @@ export class OfficeDaysComponent implements OnInit {
     const effectiveDays = Math.max(0, this.totalBusinessDays - this.PTO);
     this.exactOfficeDays = effectiveDays * this.OFFICE_PERCENTAGE;
     this.officeDaysRounded = Math.round(this.exactOfficeDays);
+  }
+
+  private isWeekend(dow: number): boolean {
+    return dow === 0 || dow === 6;
   }
 }
