@@ -51,3 +51,13 @@
     {{ day.date }} - {{ day.description }}
   </li>
 </ul>
+
+@if (holidaysOnWeekends.length > 0) {
+<h2>Holidays we won't get to enjoy</h2>
+<ul>
+  <li *ngFor="let day of holidaysOnWeekends">
+    <span *ngIf="day.type === 'holiday'">📅</span>
+    {{ day.date }} - {{ day.description }}
+  </li>
+</ul>
+}

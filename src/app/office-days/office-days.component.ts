@@ -24,7 +24,6 @@ interface DayInfo {
 export class OfficeDaysComponent implements OnInit {
   PTO: number = 0;
   holidays: Holiday[] = [];
-  holidayDescriptions: string[] = [];
 
   selectedMonth: number;
   selectedYear: number;
@@ -54,6 +53,7 @@ export class OfficeDaysComponent implements OnInit {
   totalWeekdayHolidays: number = 0;
 
   visibleDays: DayInfo[] = [];
+  holidaysOnWeekends: DayInfo[] = [];
 
   constructor() {
     const today = new Date();
@@ -102,9 +102,9 @@ export class OfficeDaysComponent implements OnInit {
     });
 
     const weekdayHolidays = new Set<string>();
-    this.holidayDescriptions = [];
     this.totalWeekdayHolidays = 0;
     this.visibleDays = [];
+    this.holidaysOnWeekends = [];
 
     holidaysThisMonth.forEach((h) => {
       const date = new Date(h.date);
@@ -117,8 +117,13 @@ export class OfficeDaysComponent implements OnInit {
           description: h.description,
           type: 'holiday',
         });
+      } else {
+        this.holidaysOnWeekends.push({
+          date: h.date,
+          description: h.description,
+          type: 'holiday',
+        });
       }
-      this.holidayDescriptions.push(`${h.date}: ${h.description}`);
     });
 
     const daysInMonth = new Date(
