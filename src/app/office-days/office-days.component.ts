@@ -145,6 +145,6 @@ export class OfficeDaysComponent implements OnInit {
 
     const effectiveDays = Math.max(0, this.totalBusinessDays - this.PTO);
     this.exactOfficeDays = effectiveDays * this.OFFICE_PERCENTAGE;
-    this.officeDaysRounded = Math.floor(this.exactOfficeDays);
+    this.officeDaysRounded = Math.round(this.exactOfficeDays);
   }
 }
