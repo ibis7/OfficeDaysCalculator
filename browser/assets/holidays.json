@@ -1,0 +1,21 @@
+[
+  { "date": "2025-01-01", "description": "Año Nuevo" },
+  { "date": "2025-03-03", "description": "Carnaval (Lunes)" },
+  { "date": "2025-03-04", "description": "Carnaval (Martes)" },
+  { "date": "2025-04-18", "description": "Semana de Turismo (Viernes Santo)" },
+  { "date": "2025-05-01", "description": "Día de los Trabajadores" },
+  { "date": "2025-07-18", "description": "Jura de la Constitución" },
+  { "date": "2025-08-25", "description": "Día de la Independencia" },
+  { "date": "2025-12-25", "description": "Navidad" },
+  { "date": "2025-12-31", "description": "Víspera de Año Nuevo" },
+
+  { "date": "2026-01-01", "description": "Año Nuevo" },
+  { "date": "2026-02-16", "description": "Carnaval (Lunes)" },
+  { "date": "2026-02-17", "description": "Carnaval (Martes)" },
+  { "date": "2026-04-03", "description": "Semana de Turismo (Viernes Santo)" },
+  { "date": "2026-05-01", "description": "Día de los Trabajadores" },
+  { "date": "2026-07-18", "description": "Jura de la Constitución" },
+  { "date": "2026-08-25", "description": "Día de la Independencia" },
+  { "date": "2026-12-25", "description": "Navidad" },
+  { "date": "2026-12-31", "description": "Víspera de Año Nuevo" }
+]
