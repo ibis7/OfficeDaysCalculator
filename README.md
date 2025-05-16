@@ -11,4 +11,4 @@ To execute, either clone the files and run locally as any Angular app or:
 To upload a new version
 
 1. Run ng serve to test locally
-2. Run ng build --configuration production --base-href "/OfficeDaysCalculator/"
+2. Run ng build --configuration production --base-href "/OfficeDaysCalculator/dist/office-days-app/browser/"
