@@ -46,7 +46,7 @@ export class OfficeDaysComponent implements OnInit {
     'December',
   ];
 
-  officeDaysRounded: number | null = null;
+  finalOfficeDays: number | null = null;
   exactOfficeDays: number = 0;
   totalBusinessDays: number = 0;
   totalWeekendDays: number = 0;
@@ -70,11 +70,11 @@ export class OfficeDaysComponent implements OnInit {
     this.loadHolidays();
   }
 
-  onSelectionChange(): void {
+  public onSelectionChange(): void {
     this.calculateOfficeDays();
   }
 
-  loadHolidays(): void {
+  private loadHolidays(): void {
     fetch('assets/holidays.json')
       .then((response) => response.json())
       .then((data: Holiday[]) => {
@@ -95,62 +95,81 @@ export class OfficeDaysComponent implements OnInit {
       });
   }
 
-  calculateOfficeDays(): void {
-    const holidaysThisMonth = this.holidays.filter((h) => {
-      const [year, month, day] = h.date.split('-').map(Number);
-      return year === this.selectedYear && month - 1 == this.selectedMonth;
-    });
+  public calculateOfficeDays(): void {
+    const holidaysThisMonth = this.getHolidaysThisMonth();
+    const weekdayHolidayDates = this.categorizeHolidays(holidaysThisMonth);
+    this.countBusinessAndWeekendDays(weekdayHolidayDates);
+    this.calculateFinalOfficeDays();
+  }
 
-    const weekdayHolidays = new Set<string>();
-    this.totalWeekdayHolidays = 0;
+  private getHolidaysThisMonth(): Holiday[] {
+    return this.holidays.filter(({ date }) => {
+      const [year, month] = date.split('-').map(Number);
+      return (
+        Number(year) === Number(this.selectedYear) &&
+        Number(month) - 1 === Number(this.selectedMonth)
+      );
+    });
+  }
+
+  private categorizeHolidays(holidays: Holiday[]): string[] {
     this.visibleDays = [];
     this.holidaysOnWeekends = [];
+    this.totalWeekdayHolidays = 0;
 
-    holidaysThisMonth.forEach((h) => {
-      const date = new Date(h.date);
+    const weekdayDates: string[] = [];
+
+    for (const holiday of holidays) {
+      const date = new Date(holiday.date);
       const dow = date.getDay();
-      if (!this.isWeekend(dow)) {
-        weekdayHolidays.add(h.date);
-        this.totalWeekdayHolidays++;
-        this.visibleDays.push({
-          date: h.date,
-          description: h.description,
-          type: 'holiday',
-        });
+      const holidayInfo: DayInfo = {
+        date: holiday.date,
+        description: holiday.description,
+        type: 'holiday',
+      };
+
+      if (this.isWeekend(dow)) {
+        this.holidaysOnWeekends.push(holidayInfo);
       } else {
-        this.holidaysOnWeekends.push({
-          date: h.date,
-          description: h.description,
-          type: 'holiday',
-        });
+        this.visibleDays.push(holidayInfo);
+        weekdayDates.push(holiday.date);
+        this.totalWeekdayHolidays++;
       }
-    });
+    }
+
+    return weekdayDates;
+  }
+
+  private countBusinessAndWeekendDays(weekdayHolidayDates: string[]): void {
+    this.totalWeekendDays = 0;
+    this.totalBusinessDays = 0;
 
     const daysInMonth = new Date(
       this.selectedYear,
       this.selectedMonth + 1,
       0
     ).getDate();
-    this.totalWeekendDays = 0;
-    this.totalBusinessDays = 0;
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(this.selectedYear, this.selectedMonth, day);
       const dow = date.getDay();
-      const dateStr = date.toISOString().split('T')[0];
+      const isoDate = date.toISOString().split('T')[0];
 
       if (this.isWeekend(dow)) {
         this.totalWeekendDays++;
         continue;
       }
-      if (weekdayHolidays.has(dateStr)) continue;
+
+      if (weekdayHolidayDates.includes(isoDate)) continue;
 
       this.totalBusinessDays++;
     }
+  }
 
+  private calculateFinalOfficeDays(): void {
     const effectiveDays = Math.max(0, this.totalBusinessDays - this.PTO);
     this.exactOfficeDays = effectiveDays * this.OFFICE_PERCENTAGE;
-    this.officeDaysRounded = Math.round(this.exactOfficeDays);
+    this.finalOfficeDays = Math.min(8, Math.round(this.exactOfficeDays));
   }
 
   private isWeekend(dow: number): boolean {

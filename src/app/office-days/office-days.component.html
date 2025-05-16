@@ -36,9 +36,9 @@
   <li>PTO days: {{ PTO }}</li>
 </ul>
 
-<p *ngIf="officeDaysRounded !== null">
-  You should go to the office <strong>{{ officeDaysRounded }}</strong> day(s)
-  this month.<br />
+<p *ngIf="finalOfficeDays !== null">
+  You should go to the office <strong>{{ finalOfficeDays }}</strong> day(s) this
+  month.<br />
   (Exact: {{ exactOfficeDays.toFixed(2) }})
 </p>
 
