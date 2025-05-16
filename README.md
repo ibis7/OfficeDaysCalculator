@@ -13,4 +13,4 @@ To upload a new version
 1. Run ng serve to test locally
 2. Run ng build --configuration production --base-href "/OfficeDaysCalculator/"
 3. Run git remote add origin https://github.com/ibis7/OfficeDaysCalculator.git
-4. Deploy with npx angular-cli-ghpages --dir=dist/office-days-app
+4. Deploy with npx angular-cli-ghpages --dir=dist/office-days-app/browser
