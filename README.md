@@ -11,5 +11,4 @@ To execute, either clone the files and run locally as any Angular app or:
 To upload a new version
 
 1. Run ng serve to test locally
-2. Run ng build --configuration production
-3. Zip it and version it (don't delete previous zip)
+2. Run ng build --configuration production --base-href "/OfficeDaysCalculator/"
